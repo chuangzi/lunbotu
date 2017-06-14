@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>slider</title>
+    <style type="text/css">
+        body, p, img, dl, dt, dd, ul, ol, h1, h2, h3, h4, h5, h6 { margin: 0; padding: 0; }
+
+        body { position: relative; font: 12px/1.5 Simsun, Arial; color: #666; text-align: left; background: #000; }
+
+        ul, ol { list-style: none; }
+
+        img { border: 0 none; }
+
+        input, select { vertical-align: middle; }
+
+        table { border-collapse: collapse; }
+
+        s, em, i { font-style: normal; text-decoration: none; }
+
+        a { outline: none; text-decoration: none; }
+
+        a:hover { text-decoration: underline; }
+
+        .clear { *zoom: 1; }
+
+        .clear:after { clear: both; content: "."; display: block; height: 0; overflow: hidden; visibility: hidden; zoom: 1; }
+
+        .slideBox {
+            position: relative;
+            width: 600px;
+            height: 300px;
+            overflow: hidden;
+        }
+
+        .slideBox ul.items {
+            position: absolute;
+            width: 8000px;
+            height: 300px;
+        }
+
+        .slideBox ul.items li {
+            float: left;
+            /*position: absolute;*/
+            width: 600px;
+            height: 300px;
+            /*display: none;*/
+        }
+
+        .slideBox .arrows .arrow-left {
+            background: url(images/sprite-arrow-prev.png) no-repeat;
+            width: 22px;
+            height: 32px;
+            position: absolute;
+            left: 10px;
+            top: 110px;
+        }
+
+        .slideBox .arrows .arrow-right {
+            background: url(images/sprite-arrow-next.png) no-repeat;
+            width: 22px;
+            height: 32px;
+            position: absolute;
+            right: 10px;
+            top: 110px;
+        }
+        .slideBox .dots{
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            bottom: 10px;
+        }
+        .slideBox .dots a{
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: #949494;
+            display: inline-block;
+            margin: 0 8px;
+        }
+        .slideBox .dots a.curr{
+            background-color: #F00;
+        }
+    </style>
+</head>
+<body>
+
+<div id="slide" class="slideBox">
+    <ul class="items J-items">
+        <li>
+            <a href="#" target="_blank">
+                <img src="images/image1.jpg">
+            </a>
+        </li>
+        <li>
+            <a href="#" target="_blank">
+                <img src="images/image2.jpg">
+            </a>
+        </li>
+        <li>
+            <a href="#" target="_blank">
+                <img src="images/image3.jpg">
+            </a>
+        </li>
+        <li>
+            <a href="#" target="_blank">
+                <img src="images/image4.jpg">
+            </a>
+        </li>
+        <li>
+            <a href="#" target="_blank">
+                <img src="images/image5.jpg">
+            </a>
+        </li>
+    </ul>
+    <div class="arrows">
+        <a class="arrow-left J-arrow-left" href="javascript:;" target="_self"></a>
+        <a class="arrow-right J-arrow-right" href="javascript:;" target="_self"></a>
+    </div>
+    <div class="dots">
+        <a href="javascript:;"></a>
+        <a href="javascript:;"></a>
+        <a href="javascript:;"></a>
+        <a href="javascript:;"></a>
+        <a href="javascript:;"></a>
+    </div>
+</div>
+<br/>
+<div id="slide2" class="slideBox">
+    <ul class="items J-items">
+        <li>
+            <a href="#" target="_blank">
+                <img src="images/image1.jpg">
+            </a>
+        </li>
+        <li>
+            <a href="#" target="_blank">
+                <img src="images/image2.jpg">
+            </a>
+        </li>
+        <li>
+            <a href="#" target="_blank">
+                <img src="images/image3.jpg">
+            </a>
+        </li>
+        <li>
+            <a href="#" target="_blank">
+                <img src="images/image4.jpg">
+            </a>
+        </li>
+        <li>
+            <a href="#" target="_blank">
+                <img src="images/image5.jpg">
+            </a>
+        </li>
+    </ul>
+    <div class="arrows">
+        <a class="arrow-left J-arrow-left" href="javascript:;" target="_self"></a>
+        <a class="arrow-right J-arrow-right" href="javascript:;" target="_self"></a>
+    </div>
+    <div class="dots">
+        <a href="javascript:;"></a>
+        <a href="javascript:;"></a>
+        <a href="javascript:;"></a>
+        <a href="javascript:;"></a>
+        <a href="javascript:;"></a>
+    </div>
+</div>
+<script type="text/javascript" src="js/jquery.js"></script>
+<script type="text/javascript">
+    $(function () {
+        function Slide(opts) { //创建类  构造函数
+            this.init(opts);
+        }
+
+        Slide.prototype = {  //原型
+            $slide: null,
+            $arrowLeft: null,
+            $arrowRight: null,
+            $items: null,
+            $li: null,
+            $dot: null,
+            index: 0,
+            timeOutId: 0,
+            speed: 500,
+            delay: 3000,
+            autoPlay: true,
+            onchange: $.noop,
+            init: function (opts) { //初始化函数
+                var _this = this; //this 指向当前的对象slide
+                _this.$slide = opts.$target;
+                _this.$arrowLeft = _this.$slide.find('.J-arrow-left');
+                _this.$arrowRight = _this.$slide.find('.J-arrow-right');
+                _this.$items = _this.$slide.find('.J-items');
+                _this.$li = _this.$items.find('li');
+                _this.$dot = _this.$slide.find('.dots a');// 找a标签
+                console.log(_this.$dot);
+
+               /* _this.index = opts.index || _this.index;
+                _this.speed = opts.speed || _this.speed;
+                _this.delay = opts.delay || _this.delay;
+                _this.autoPlay = typeof opts.autoPlay != 'undefined' ? opts.autoPlay : _this.autoPlay;
+                _this.onchange = opts.onchange || _this.onchange;*/
+
+                $.extend(_this, opts); //等同于上面注释的代码
+
+                _this.copyLi();
+//                console.log(_this.autoPlay);
+
+                _this.addEvents();
+//                console.log(_this.autoPlay);
+                _this.change(_this.index, false);
+//                console.log(opts.autoPlay);
+                if (_this.autoPlay) {
+                    _this.autoMove();
+                }
+            },
+            copyLi:function () {
+                var _this = this;
+                var $newLi = _this.$li.eq(0).clone();// $li.first(0)
+                _this.$items.append($newLi); // appendTo
+                _this.$li = _this.$items.find('li');
+            },
+            addEvents: function () { //添加事件函数
+                var _this = this;
+                _this.$arrowLeft.click(function () { //左箭头侦听事件
+                    _this.move('left');
+                });
+                _this.$arrowRight.click(function () { //右箭头侦听事件
+                    _this.move('right');
+                });
+                _this.$dot.click(function () { //圆点侦听事件
+                    var index = $(this).index();  //this 指a标签
+//                    console.log(index);
+                    _this.change(index, true); //ture表示动画效果 false表示css直接改变效果
+                });
+            },
+            move: function (direction) { //direction 方向left right
+                var _this = this;
+                if (direction == 'left') {
+                    if (_this.index == 0){  //把第一张转为最后一张
+                        _this.change(5,false);
+                    }
+                    _this.index--;
+                } else {
+                    _this.index++;
+                }
+                _this.change(_this.index, true);
+            },
+            change: function (index, needAnimates) {
+                var _this = this;
+                _this.index = index;
+                if (_this.index < 0) {
+                    _this.index = _this.$li.length - 1;
+                }
+                if (_this.index > _this.$li.length - 1) {
+                    _this.index = 0;
+                }
+                clearTimeout(_this.timeOutId);
+
+                if(_this.index == 5){
+                    _this.$dot.removeClass().eq(0).addClass('curr');
+                }else {
+                    _this.$dot.removeClass().eq(_this.index).addClass('curr');
+                }
+                /*_this.$dot.removeClass();//移除所有高光的点
+                _this.$dot.eq(_this.index).addClass('curr');//添加对应的图片下标高光点*/
+
+                if (needAnimates) { //判断是否需要动画效果
+                    _this.$items.stop().animate({   //stop
+                        marginLeft: _this.$li.width() * -_this.index
+                    }, _this.speed, function () {
+                        if (_this.index ==5){  //到克隆那张后 转变为第一张
+                            _this.change(0, false)
+                        }
+                        if (_this.autoPlay) {
+                            _this.autoMove();
+                        }
+                    });
+                } else {
+                    _this.$items.stop().css('marginLeft', _this.$li.width() * -_this.index)
+                }
+                if (_this.index < 5){
+                    _this.onchange(_this.index);
+                }
+
+            },
+
+            autoMove: function () { //延迟效果函数
+                var _this = this;
+                _this.timeOutId = setTimeout(function () {
+                    _this.move('right')
+                }, _this.delay)
+            }
+        };
+
+        var slide = new Slide({
+            $target: $('#slide'),
+//            speed: 1000,
+//            delay: 2000,
+            autoPlay: false
+//            index: 3,
+//            onchange: function (index) {
+//                if (index == 4){
+//                    $('body').css('background', '#ff0');
+//                }else {
+//                    $('body').css('background', '#fff');
+//                }
+//            }
+        });
+
+        var slide2 = new Slide({
+            $target: $('#slide2')
+//            speed: 2000,
+//            delay: 3000,
+//            autoPlay: true,
+//            index: 2,
+//            onchange: function (index) {
+//                if (index == 4){
+//                    $('body').css('background', '#ff0');
+//                }else {
+//                    $('body').css('background', '#fff');
+//                }
+//            }
+        });
+    })
+</script>
+</body>
+</html>
